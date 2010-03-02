@@ -1,0 +1,43 @@
+#! /usr/bin/python
+
+import spimage, sys
+
+if len(sys.argv) <= 1:
+    print """
+Usage:  python_script_image_info <in.h5>
+"""
+    exit(1)
+
+try:
+    img = spimage.sp_image_read(sys.argv[1],0)
+except:
+    print "Error: Can not read image %s" % sys.argv[1]
+    exit(1)
+
+print "%s: (%dD image)" % (sys.argv[1],img.num_dimensions)
+if img.num_dimensions == 3:
+    print "size = %d x %d x %d" % (spimage.sp_image_x(img),
+                                   spimage.sp_image_y(img),
+                                   spimage.sp_image_z(img))
+    print "center = %g x %g x %g" % (img.detector.image_center[0],
+                                     img.detector.image_center[1],
+                                     img.detector.image_center[2])
+else:
+    print "size = %d x %d" % (spimage.sp_image_x(img),
+                              spimage.sp_image_y(img))
+    print "center = %g x %g" % (img.detector.image_center[0],
+                                img.detector.image_center[1])
+
+print "shifted = %d" % img.shifted
+print "scaled = %d" % img.scaled
+print "phased = %d" % img.phased
+print "wavelength = %g" % img.detector.wavelength
+print "detector distance = %g" % img.detector.detector_distance
+if img.num_dimensions == 3:
+    print "pixel size = %g x %g x %g" % (img.detector.pixel_size[0],
+                                         img.detector.pixel_size[1],
+                                         img.detector.pixel_size[2])
+else:
+    print "pixel size = %g x %g" % (img.detector.pixel_size[0],
+                                    img.detector.pixel_size[1])
+
