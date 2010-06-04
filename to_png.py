@@ -14,11 +14,15 @@ This program converts all h5 files in the curren directory to png.
 Usage:  python_script_to_png [colorscale]
 
 Colorscales:
+Jet
+Gray
 PosNeg
 InvertedPosNeg
 Phase
 InvertedPhase
 Log (can be combined with the others)
+Shift (can be combined with the others)
+Support
 
 """
     exit(1)
@@ -30,6 +34,7 @@ expr = re.compile('.h5$')
 files = filter(expr.search,l)
 
 log_flag = 0
+shift_flag = 0
 support_flag = 0
 color = 16
 
@@ -48,6 +53,8 @@ for flag in sys.argv[1:]:
         color = 1
     elif flag == 'Log':
         log_flag = 1
+    elif flag == 'Shift':
+        shift_flag = 1
     elif flag == 'Support':
         support_flag = 1
     else:
@@ -56,15 +63,22 @@ for flag in sys.argv[1:]:
 if log_flag == 1:
     color += 128
 
+for f in files:
+    img = spimage.sp_image_read(f[:-1],0)
+
+shift_function = spimage.sp_image_shift    
+if shift_flag:
+    def shift_function(img):
+        return img
+
 if support_flag:
     for f in files:
         img = spimage.sp_image_read(f[:-1],0)
         spimage.sp_image_mask_to_image(img,img)
-        spimage.sp_image_write(img,f[:-3]+"png",color)
+        spimage.sp_image_write(shift_function(img),f[:-3]+"png",color)
         spimage.sp_image_free(img)
 else:
     for f in files:
         img = spimage.sp_image_read(f[:-1],0)
-        spimage.sp_image_write(img,f[:-3]+"png",color)
+        spimage.sp_image_write(shift_function(img),f[:-3]+"png",color)
         spimage.sp_image_free(img)
-#        os.system("image_to_png %s %s" % (f[:-1],f[:-3] + "png"))

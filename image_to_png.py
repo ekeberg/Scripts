@@ -7,11 +7,14 @@ if len(sys.argv) <= 1:
 Usage:  python_script_image_to_png <image_in.h5> <image_out.h5> [colorscale]
 
 Colorscales:
+Jet
+Gray
 PosNeg
 InvertedPosNeg
 Phase
 InvertedPhase
 Log (can be combined with the others)
+Shift (can be combined with the others)
 
 """
     exit(1)
