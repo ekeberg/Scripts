@@ -54,14 +54,14 @@ else:
     log_function = no_log
 
 if (plot_flag == "mask"):
-    pylab.imshow(img.mask,origin='lower')
+    pylab.imshow(img.mask,origin='lower',interpolation="nearest")
 elif(plot_flag == "phase"):
-    pylab.imshow(pylab.angle(img.image),cmap='hsv',origin='lower')
+    pylab.imshow(pylab.angle(img.image),cmap='hsv',origin='lower',interpolation="nearest")
 elif(plot_flag == "real"):
-    pylab.imshow(log_function(pylab.real(img.image)),origin='lower')
+    pylab.imshow(log_function(pylab.real(img.image)),origin='lower',interpolation="nearest")
 elif(plot_flag == "imag"):
-    pylab.imshow(log_function(pylab.imag(img.image)),origin='lower')
+    pylab.imshow(log_function(pylab.imag(img.image)),origin='lower',interpolation="nearest")
 else:
-    pylab.imshow(log_function(abs(img.image)),origin='lower')
+    pylab.imshow(log_function(abs(img.image)),origin='lower',interpolation="nearest")
 
 pylab.show()

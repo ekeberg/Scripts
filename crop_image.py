@@ -12,6 +12,10 @@ xside is used for both sides.
 """
     exit(1)
 
+print "argv[1] = ", sys.argv[1]
+print "argv[2] = ", sys.argv[2]
+print "argv[3] = ", sys.argv[3]
+
 try:
     img = spimage.sp_image_read(sys.argv[1],0)
 except:
@@ -33,17 +37,33 @@ if img.shifted:
     shifted = 1
     img = spimage.sp_image_shift(img)
 
+print "shifted = ", shifted
+
 lowX = int(img.detector.image_center[0]-(sideX/2.0-0.5))
 highX = int(img.detector.image_center[0]+(sideX/2.0-0.5))
 lowY = int(img.detector.image_center[1]-(sideY/2.0-0.5))
 highY = int(img.detector.image_center[1]+(sideY/2.0-0.5))
 
+print lowX, " ", highX
+print lowY, " ", highY
+
 cropped = spimage.rectangle_crop(img,lowX,lowY,highX,highY)
+
+print "did crop"
 
 if shifted:
     cropped = spimage.sp_image_shift(cropped)
 
+print "shifted (or not)"
+
+print "write ", sys.argv[2]
+
+print "orientation = ", cropped.detector.orientation
+print sp_3matrix_get(cropped.detector.orientation,0,0)
+
 try:
-    spimage.sp_image_write(cropped,sys.argv[2],0)
+    spimage.sp_image_write(cropped,sys.argv[2],16)
 except:
-    print "Error: can not write to %s\n" % sys.argv[1]
+    print "Error: can not write to %s\n" % sys.argv[2]
+
+print "end"
