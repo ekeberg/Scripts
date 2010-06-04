@@ -66,19 +66,25 @@ if log_flag == 1:
 for f in files:
     img = spimage.sp_image_read(f[:-1],0)
 
-shift_function = spimage.sp_image_shift    
+def shift_function(img):
+    return img
+
 if shift_flag:
     def shift_function(img):
-        return img
+        ret = spimage.sp_image_shift(img)
+        spimage.sp_image_free(img)
+        return ret
 
 if support_flag:
     for f in files:
         img = spimage.sp_image_read(f[:-1],0)
         spimage.sp_image_mask_to_image(img,img)
-        spimage.sp_image_write(shift_function(img),f[:-3]+"png",color)
+        img = shift_function(img)
+        spimage.sp_image_write(img,f[:-3]+"png",color)
         spimage.sp_image_free(img)
 else:
     for f in files:
         img = spimage.sp_image_read(f[:-1],0)
-        spimage.sp_image_write(shift_function(img),f[:-3]+"png",color)
+        img = shift_function(img)
+        spimage.sp_image_write(img,f[:-3]+"png",color)
         spimage.sp_image_free(img)
