@@ -3,15 +3,17 @@
 import sys
 import pylab
 
-def plot_1d():
-    if len(sys.argv) < 2:
+def plot_1d(arguments):
+    if isinstance(arguments,str):
+        arguments = [arguments]
+    if len(arguments) < 1:
         print "Need at least one data set"
         sys.exit(1)
 
     fig = pylab.figure(1)
     ax = fig.add_subplot(111)
 
-    for f in sys.argv[1:]:
+    for f in arguments:
         try:
             data = pylab.loadtxt(f)
         except:
@@ -22,11 +24,11 @@ def plot_1d():
 
         ax.plot(data,label=f)
 
-    if len(sys.argv) > 2:
+    if len(arguments) > 1:
         ax.legend()
 
     return data
 
 if __name__ == "__main__":
-    plot_1d()
+    plot_1d(sys.argv[1:])
     pylab.show()
