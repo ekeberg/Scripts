@@ -4,28 +4,24 @@ import sys, pylab, spimage
 
 log_flags = ['log']
 
-def plot_phases():
+def plot_phases(in_file,*arguments):
     flags = ['histogram','phases']
     plot_flag = 0
     log_flag = 0
     def no_log(x):
         return x
 
-    if len(sys.argv) < 2:
-        print "Need at least one data set"
-        sys.exit(1)
-
     fig = pylab.figure(1)
     ax = fig.add_subplot(111)
-
+n
     try:
-        img = spimage.sp_image_read(sys.argv[1],0)
+        img = spimage.sp_image_read(in_file,0)
     except:
-        print "Error when reading %s.\n" % sys.argv[1]
-        sys.exit(1)
+        print "Error when reading %s.\n" % in_file
+        return
     values = img.image.reshape(pylab.size(img.image))
 
-    for flag in sys.argv[2:]:
+    for flag in arguments:
         if flag in flags:
             plot_flag = flag
         elif flag in log_flags:
@@ -51,5 +47,14 @@ def plot_phases():
 
 
 if __name__ == "__main__":
-    plot_phases()
-    pylab.show()
+    try:
+        plot_phases(sys.argv[1],*sys.argv[2:])
+        pylab.show()
+    except:
+        print """
+Usage: plot_phases datafile [flags]
+
+List of flags:
+histogram
+phases
+"""

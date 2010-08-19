@@ -15,6 +15,8 @@ expr = re.compile('^(.(?!%s/Scripts/global))*$' % home)
 #expr = re.compile('(?!^/home/ekeberg/Scripts/global)')
 py_files2 = filter(expr.search,py_files)
 
+py_files2.remove('%s/Scripts/scripts.py' % home)
+
 expr = re.compile('/\w+\.py')
 
 names = []
