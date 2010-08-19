@@ -39,13 +39,28 @@ if img.shifted:
 
 print "shifted = ", shifted
 
-lowX = int(img.detector.image_center[0]-(sideX/2.0-0.5))
-highX = int(img.detector.image_center[0]+(sideX/2.0-0.5))
-lowY = int(img.detector.image_center[1]-(sideY/2.0-0.5))
-highY = int(img.detector.image_center[1]+(sideY/2.0-0.5))
+lowX = img.detector.image_center[0]-(sideX/2.0-0.5)
+highX = img.detector.image_center[0]+(sideX/2.0-0.5)
+lowY = img.detector.image_center[1]-(sideY/2.0-0.5)
+highY = img.detector.image_center[1]+(sideY/2.0-0.5)
 
 print lowX, " ", highX
 print lowY, " ", highY
+
+if lowX != pylab.floor(lowX):
+    lowX = int(pylab.floor(lowX))
+    highX = int(pylab.floor(highX))
+    img.detector.image_center[0] -= 0.5
+else:
+    lowX = int(lowX)
+    highX = int(highX)
+if lowY != pylab.floor(lowY):
+    lowY = int(pylab.floor(lowY))
+    highY = int(pylab.floor(highY))
+    img.detector.image_center[1] -= 0.5
+else:
+    lowY = int(lowY)
+    highY = int(highY)
 
 cropped = spimage.rectangle_crop(img,lowX,lowY,highX,highY)
 
@@ -58,8 +73,8 @@ print "shifted (or not)"
 
 print "write ", sys.argv[2]
 
-print "orientation = ", cropped.detector.orientation
-print sp_3matrix_get(cropped.detector.orientation,0,0)
+#print "orientation = ", cropped.detector.orientation
+#print spimage.sp_3matrix_get(cropped.detector.orientation,0,0,0)
 
 try:
     spimage.sp_image_write(cropped,sys.argv[2],16)
