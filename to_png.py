@@ -8,9 +8,6 @@ image_to_png
 import os, re, sys, spimage
 
 def to_png(*arguments):
-    elif not isinstance(arguments,list):
-        print "function to_png takes must have a list or string input"
-        return
     if len(arguments) <= 0:
         print """
     This program converts all h5 files in the curren directory to png.
@@ -28,6 +25,9 @@ def to_png(*arguments):
     Support
 
     """
+        return
+    elif not (isinstance(arguments,list) or isinstance(arguments,tuple)):
+        print "function to_png takes must have a list or string input"
         return
 
 

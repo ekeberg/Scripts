@@ -18,6 +18,7 @@ def plot_image(in_file,*arguments):
     log_flag = 0
 
     for flag in arguments:
+        flag = flag.lower()
         if flag in plot_flags:
             plot_flag = flag
         elif flag in shift_flags:
