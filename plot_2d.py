@@ -26,8 +26,8 @@ def plot_2d(*arguments):
     ax = fig.add_subplot(111)
 
     for f in sys.argv[1:]:
-        data = read_2d(f)
-        if data == 0:
+        data = read_data(f)
+        if data == None:
             return
         reference = data[0]
         plots = data[1:]

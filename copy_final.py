@@ -4,27 +4,29 @@ import os
 import re
 import sys
 
-def copy_final(final):
-    if len(arguments) != 1:
-        print "Usage: copy_final.py <last iteration number>"
-        sys.exit(1)
-    try:
-        last_iteration = final
-    except:
-        print "Error: \"%s\" is not a valid iteration number" % final
-        sys.exit(1);
+def copy_final(in_dir,out_dir):
+    l = os.listdir(in_dir)
 
-    l = os.popen('ls').readlines()
+    dirs = [d for d in l if re.search("^[0-9]{6}$",d)]
+    dirs.sort()
 
-    expr = re.compile('[0-9]{6}')
-    dirs = filter(expr.search,l)
-    dirs = [d[:-1] for d in dirs]
+    l = os.listdir("%s/%s" % (in_dir,dirs[0]))
+
+    files = [i for i in l if re.search("^real_space-[0-9]{7}.h5$",i)]
+    files.sort()
+
+    final_file = files[-1]
+    print "Using file %s" % final_file
 
     for d in dirs:
-        os.system("cp %s/real_space-%.7d.h5 final_real/%.3d.h5" % (d,last_iteration,int(d)))
+        try:
+            os.system("cp %s/%s/%s %s/%.4d.h5" % (in_dir,d,final_file,out_dir,int(d)))
+        except:
+            print "Problem copying file from %s" % d
+
 
 if __name__ == "__main__":
-    try:
-        copy_final(int(sys.argv[1:]))
-    except:
-        print "Usage: copy_final <last iteration number>"
+    if len(sys.argv) != 3:
+        print "Usage: copy_final.py <in_dir> <out_dir>"
+        sys.exit(1)
+    copy_final(sys.argv[1],sys.argv[2])

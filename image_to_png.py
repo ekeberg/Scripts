@@ -2,7 +2,7 @@
 
 import spimage, pylab, sys
 
-def to_png(arguments):
+def image_to_png(arguments):
     if isinstance(arguments,str):
         arguments = [arguments]
     elif not isinstance(arguments,list):
@@ -27,15 +27,15 @@ def to_png(arguments):
         exit(1)
 
     try:
-        img = spimage.sp_image_read(sys.argv[1],0)
+        img = spimage.sp_image_read(arguments[0],0)
     except:
-        print "Error: %s is not a readable .h5 file\n" % sys.argv[1]
+        print "Error: %s is not a readable .h5 file\n" % arguments[0]
         exit(1)
 
     log_flag = 0
     shift_flag = 0
 
-    for flag in sys.argv[3:]:
+    for flag in arguments[2:]:
         if flag == 'PosNeg':
             color = 8192
         elif flag == 'InvertedPosNeg':
@@ -62,9 +62,9 @@ def to_png(arguments):
         img = spimage.sp_image_shift(img)
 
     try:
-        spimage.sp_image_write(img,sys.argv[2],color)
+        spimage.sp_image_write(img,arguments[1],color)
     except:
-        print "Error: Can not write %s\n" % sys.argv[2]
+        print "Error: Can not write %s\n" % arguments[1]
         exit(1)
 
 if __name__ == "__main__":
