@@ -69,29 +69,31 @@ def to_png(*arguments):
     # for f in files:
     #     img = spimage.sp_image_read(f[:-1],0)
 
-    def shift_function(img):
-        return img
-
-    if shift_flag:
         def shift_function(img):
-            ret = spimage.sp_image_shift(img)
-            spimage.sp_image_free(img)
-            return ret
+            return img
 
-    if support_flag:
-        for f in files:
-            img = spimage.sp_image_read(f[:-1],0)
-            spimage.sp_image_mask_to_image(img,img)
-            img = shift_function(img)
-            spimage.sp_image_write(img,f[:-3]+"png",color)
-            spimage.sp_image_free(img)
-    else:
-        for f in files:
-            img = spimage.sp_image_read(f[:-1],0)
-            img = shift_function(img)
-            spimage.sp_image_write(img,f[:-3]+"png",color)
-            spimage.sp_image_free(img)
+        if shift_flag:
+            def shift_function(img):
+                ret = spimage.sp_image_shift(img)
+                spimage.sp_image_free(img)
+                return ret
 
+        if support_flag:
+            for f in files:
+                img = spimage.sp_image_read(f[:-1],0)
+                spimage.sp_image_mask_to_image(img,img)
+                img = shift_function(img)
+                spimage.sp_image_write(img,f[:-3]+"png",color)
+                spimage.sp_image_free(img)
+        else:
+            for f in files:
+                img = spimage.sp_image_read(f[:-1],0)
+                img = shift_function(img)
+                spimage.sp_image_write(img,f[:-3]+"png",color)
+                if shift_flag:
+                    spimage.sp_image_free(img)
+
+        spimage.sp_image_free(img)
 
 if __name__ == "__main__":
     to_png(*sys.argv[1:])
