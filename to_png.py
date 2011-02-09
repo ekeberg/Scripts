@@ -90,7 +90,8 @@ def to_png(*arguments):
                 img = spimage.sp_image_read(f[:-1],0)
                 img = shift_function(img)
                 spimage.sp_image_write(img,f[:-3]+"png",color)
-                spimage.sp_image_free(img)
+                if shift_flag:
+                    spimage.sp_image_free(img)
 
         spimage.sp_image_free(img)
 
