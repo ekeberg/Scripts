@@ -66,8 +66,8 @@ def to_png(*arguments):
     if log_flag == 1:
         color += 128
 
-    for f in files:
-        img = spimage.sp_image_read(f[:-1],0)
+    # for f in files:
+    #     img = spimage.sp_image_read(f[:-1],0)
 
     def shift_function(img):
         return img

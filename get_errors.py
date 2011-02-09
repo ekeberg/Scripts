@@ -22,5 +22,5 @@ def get_errors():
     for i in ferr:
         print i
 
-if __name__ == "__init__":
+if __name__ == "__main__":
     get_errors()
