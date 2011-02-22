@@ -7,7 +7,12 @@ image_to_png
 """
 import os, re, sys, spimage
 
-def to_png(*arguments):
+def read_files():
+    l = os.listdir('.')
+    files = [f for f in l if  re.search('.h5$',f)]
+    return files
+
+def evaluate_arguments(arguments):
     if len(arguments) <= 0:
         print """
     This program converts all h5 files in the curren directory to png.
@@ -29,12 +34,6 @@ def to_png(*arguments):
     elif not (isinstance(arguments,list) or isinstance(arguments,tuple)):
         print "function to_png takes must have a list or string input"
         return
-
-
-    l = os.popen('ls').readlines()
-
-    expr = re.compile('.h5$')
-    files = filter(expr.search,l)
 
     log_flag = 0
     shift_flag = 0
@@ -65,36 +64,94 @@ def to_png(*arguments):
 
     if log_flag == 1:
         color += 128
-
-    # for f in files:
-    #     img = spimage.sp_image_read(f[:-1],0)
-
+    return color,shift_flag,support_flag
+    
+def get_shift_function(bool):
+    if bool:
+        def shift_function(img):
+            ret = spimage.sp_image_shift(img)
+            spimage.sp_image_free(img)
+            return ret
+    else:
         def shift_function(img):
             return img
+    return shift_function
 
-        if shift_flag:
-            def shift_function(img):
-                ret = spimage.sp_image_shift(img)
-                spimage.sp_image_free(img)
-                return ret
+def get_support_function(bool):
+    if bool:
+        def support_function(img):
+            spimage.sp_image_mask_to_image(img,img)
+    else:
+        def support_function(img):
+            pass
+    return support_function
 
-        if support_flag:
+def to_png_parallel(*arguments):
+    import multiprocessing
+    import Queue
+    from pylab import split, array
+
+    class Worker(multiprocessing.Process):
+        def __init__(self, working_queue, process_function, color):
+            multiprocessing.Process.__init__(self)
+            self.working_queue = working_queue
+            self.process_function = process_function
+            self.color = color
+        def process(self, files):
             for f in files:
-                img = spimage.sp_image_read(f[:-1],0)
-                spimage.sp_image_mask_to_image(img,img)
-                img = shift_function(img)
-                spimage.sp_image_write(img,f[:-3]+"png",color)
+                img = spimage.sp_image_read(f,0)
+                img = self.process_function(img)
+                spimage.sp_image_write(img,f[:-2]+"png",self.color)
                 spimage.sp_image_free(img)
+        def run(self):
+            while not self.working_queue.empty():
+                #print "%s get new" % self.name
+                files = self.working_queue.get_nowait()
+                self.process(files)
+
+    def split_files(files,n):
+        rest = len(files)%n
+        if rest:
+            super_list = split(array(files)[:-rest],len(files)/n)
+            super_list.append(files[-rest:])
         else:
-            for f in files:
-                img = spimage.sp_image_read(f[:-1],0)
-                img = shift_function(img)
-                spimage.sp_image_write(img,f[:-3]+"png",color)
-                if shift_flag:
-                    spimage.sp_image_free(img)
+            super_list = split(array(files),len(files)/n)
+        return super_list
 
+    def run_threads(arguments,nThreads):
+        color,shift_flag,support_flag = evaluate_arguments(arguments)
+        shift_function = get_shift_function(shift_flag)
+        support_function = get_support_function(support_flag)
+        def process_function(img):
+            support_function(img)
+            return shift_function(img)
+        
+        files = read_files()
+        super_list = split_files(files,10)
+
+        working_queue = multiprocessing.Queue()
+        for job in super_list:
+            working_queue.put(job)
+
+        for i in range(nThreads):
+            Worker(working_queue, process_function, color).start()
+
+    run_threads(arguments,multiprocessing.cpu_count())
+
+def to_png(*arguments):
+    color,shift_flag,support_flag = evaluate_arguments(arguments)
+    files = read_files()
+
+    shift_function = get_shift_function(shift_flag)
+    support_function = get_support_function(support_flag)
+
+    for f in files:
+        img = spimage.sp_image_read(f,0)
+        support_function(img)
+        img = sp_image_shift(img)
+        spimage.sp_image_write(img,f[:-2]+"png",color)
         spimage.sp_image_free(img)
 
 if __name__ == "__main__":
-    to_png(*sys.argv[1:])
+    to_png_parallel(*sys.argv[1:])
 
