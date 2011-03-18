@@ -2,7 +2,8 @@
 
 import sys, os, re, pwd
 
-home = "/home/%s" % pwd.getpwuid(os.getuid())[0]
+home = os.path.expanduser('~')
+#home = "/home/%s" % pwd.getpwuid(os.getuid())[0]
 
 l = os.popen("find %s/Scripts" % home).readlines()
 files = [f[:-1] for f in l]
@@ -37,5 +38,5 @@ os.system("chmod 744 %s/Scripts/global/*" % home)
 
 expr = re.compile('%s/Scripts/global' % home)
 if not expr.search(os.environ['PATH']):
-    print "It's suggested to add %s/Scripts/global to your PATH."
+    print "It's suggested to add %s/Scripts/global to your PATH." % home
 
