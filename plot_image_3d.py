@@ -25,11 +25,11 @@ options = ['shift','log','mask']
 
 for o in sys.argv:
     if o in options:
-        if o == "shift":
+        if o.lower() == "shift":
             shift = True
-        if o == "log":
+        if o.lower() == "log":
             log = True
-        if o == "mask":
+        if o.lower() == "mask":
             plot_mask = True
 
 if shift:

@@ -89,7 +89,6 @@ def get_support_function(bool):
 def to_png_parallel(*arguments):
     import multiprocessing
     import Queue
-    from pylab import split, array
 
     class Worker(multiprocessing.Process):
         def __init__(self, working_queue, process_function, color):
@@ -97,19 +96,25 @@ def to_png_parallel(*arguments):
             self.working_queue = working_queue
             self.process_function = process_function
             self.color = color
-        def process(self, files):
-            for f in files:
-                img = spimage.sp_image_read(f,0)
-                img = self.process_function(img)
-                spimage.sp_image_write(img,f[:-2]+"png",self.color)
-                spimage.sp_image_free(img)
+        def process(self, f):
+            #for f in files:
+            img = spimage.sp_image_read(f,0)
+            img = self.process_function(img)
+            spimage.sp_image_write(img,f[:-2]+"png",self.color)
+            spimage.sp_image_free(img)
         def run(self):
             while not self.working_queue.empty():
-                #print "%s get new" % self.name
-                files = self.working_queue.get_nowait()
-                self.process(files)
+                print "%s get new, approx %d left" % (self.name,self.working_queue.qsize())
+                try:
+                    #f = self.working_queue.get_nowait()
+                    f = self.working_queue.get()
+                except Queue.Empty:
+                    break
+                self.process(f)
+            print "%s done" % self.name
 
     def split_files(files,n):
+        from pylab import split, array
         rest = len(files)%n
         if rest:
             super_list = split(array(files)[:-rest],len(files)/n)
@@ -127,11 +132,13 @@ def to_png_parallel(*arguments):
             return shift_function(img)
         
         files = read_files()
-        super_list = split_files(files,10)
+        #super_list = split_files(files,10)
 
         working_queue = multiprocessing.Queue()
-        for job in super_list:
-            working_queue.put(job)
+        # for job in super_list:
+        #     working_queue.put(job)
+        for f in files:
+            working_queue.put(f)
 
         for i in range(nThreads):
             Worker(working_queue, process_function, color).start()
